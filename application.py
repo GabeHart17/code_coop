@@ -6,5 +6,10 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
+@app.route('/exercise', methods=['GET'])
+def exercise():
+    id = request.args.get('e')
+
+
 if __name__ == '__main__':
     app.run()
