@@ -2,10 +2,14 @@ import os
 import psycopg2
 from flask import Flask, render_template, request
 from scripts/database_manager import DatabaseManager, Challenge, TestCase
+import werkzeug.security as ws
 
 app = Flask(__name__)
 
-dbmgr = DatabaseManager(os.environ['DATABASE_URL'])
+db_mgr = DatabaseManager(os.environ['DATABASE_URL'])
+usr_mgr = UserManager(os.environ['DATABASE_URL'])
+login_mgr = LoginManager()
+login_mgr.init_app(app)
 
 @app.route('/')
 def home():
@@ -21,6 +25,14 @@ def challenge():
         instructions=ch.instructions,
         shown_tests=list(filter(lambda x: x.visible, ch.test_cases)),
         hidden_tests=list(filter(lambda x: !x.visible, ch.test_cases)))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    uname = request.form['username']
+    psk = request.form['password']
+    p_hash = ws.generate_password_hash(psk)
+    # get usr
+
 
 
 if __name__ == '__main__':
