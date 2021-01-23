@@ -1,11 +1,11 @@
 import os
 import psycopg2
 from flask import Flask, render_template, request
-from scripts/db_manager import DBManager
+from scripts/database_manager import DatabaseManager, Challenge, TestCase
 
 app = Flask(__name__)
 
-dbmgr = DBManager(os.environ['DATABASE_URL'])
+dbmgr = DatabaseManager(os.environ['DATABASE_URL'])
 
 @app.route('/')
 def home():
