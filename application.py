@@ -4,11 +4,14 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import werkzeug.security as ws
 from scripts.users import User, UserManager
+from scripts.database_manager import DatabaseManager, Challenge, TestCase
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-usr_mgr = UserManager(os.environ['DATABASE_URL'])
+db_url = os.environ['DATABASE_URL']
+usr_mgr = UserManager(db_url)
+db_mgr = DatabaseManager(db_url)
 login_mgr = LoginManager()
 login_mgr.init_app(app)
 
@@ -46,7 +49,6 @@ def logout():
     logout_user()
     return redirect('/')
 
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -65,6 +67,17 @@ def register():
     else:
         err = 'passwords do not match'
     return render_template('register.html', error=err)
+
+@app.route('/profile', methods=['GET'])
+def profile():
+    req_usr = request.args.get('u')
+    usr = usr_mgr.get_user_by_name(req_usr)
+    if usr is None:
+        return redirect('/')
+    if current_user.is_authenticated and req_usr == current_user.uname:
+        return redirect('/dashboard')
+    chals = db_mgr.get_challenges_by_user(usr.uid)
+    return render_template('profile.html', uname=usr.uname, challenges=chals)
 
 if __name__ == '__main__':
     app.run()

@@ -1,8 +1,12 @@
 import psycopg2
+import os
 
 class DatabaseManager:
-    def __init__(self, conn):
-        self.conn = conn;
+    def __init__(self, db_url):
+        if 'FLASK_APP' in os.environ.keys():  # test if running locally
+            self.conn = psycopg2.connect("dbname=codecoop user=postgres password=postgres host=localhost")
+        else:
+            self.conn = psycopg2.connect(db_url, sslmode='require')
         self.cur = self.conn.cursor()
 
     def add_testcase(self, chal_id, test_case):
@@ -27,9 +31,9 @@ class DatabaseManager:
         self.cur.execute("INSERT INTO challenges (title, author_id, description, instructions) VALUES (%s, %s, %s, %s);",
         (chal.title, chal.author_id, chal.desc, chal.instructions))
         self.cur.execute("SELECT MAX(id) FROM challenges")
-        chal.id = self.cur.fetchone()[0]
+        chal.cid = self.cur.fetchone()[0]
         for case in chal.test_cases:
-            self.add_testcase(chal.id, case)
+            self.add_testcase(chal.cid, case)
         conn.commit()
     def delete_challenge(self, chal_id):
         self.cur.execute("DELETE FROM challenges WHERE id=%s;", (chal_id,))
@@ -37,8 +41,8 @@ class DatabaseManager:
         conn.commit()
     def update_challenge(self, chal): #may not be a great method to call
         self.cur.execute("UPDATE challenges SET title=%s, author_id=%s, description=%s, instructions=%s WHERE id=%s;",
-        (chal.title, chal.author_id, chal.desc, chal.instructions, chal.id))
-        self.cur.execute("SELECT * FROM test_cases WHERE challenge_id=%s;", (chal.id,))
+        (chal.title, chal.author_id, chal.desc, chal.instructions, chal.cid))
+        self.cur.execute("SELECT * FROM test_cases WHERE challenge_id=%s;", (chal.cid,))
         db_data = cur.fetchall()
         chal_case_ids = [x.case_id for x in chal.test_cases]
         db_case_ids = [x[1] for x in db_data]
@@ -48,7 +52,7 @@ class DatabaseManager:
                 self.delete_testcase(case_id)
         for i in range(0, len(chal_case_ids)): # add new cases
             if chal_case_ids[i] not in db_case_ids:
-                self.add_testcase(chal.id, chal.test_cases[i])
+                self.add_testcase(chal.cid, chal.test_cases[i])
             else:
                 self.update_testcase(chal.test_cases[i])
         conn.commit()
@@ -67,15 +71,15 @@ class DatabaseManager:
         self.cur.execute("SELECT * FROM challenges WHERE author_id=%s;", (user_id,))
         chals = self.cur.fetchall()
         out = []
-        for chal_id in [x[0] for x in chals]:
-            out.append(self.get_challenge_by_id(chal_id))
+        for c in chals:
+            out.append(Challenge(*c))
         return out
     def get_challenges_by_keywords(self, search_term):
         pass
 
 class Challenge:
-    def __init__(self, chal_id, title, author_id, desc, instructions, test_cases=[]):
-        self.id = chal_id
+    def __init__(self, chal_id, author_id, title, desc, instructions, test_cases=[]):
+        self.cid = chal_id
         self.title = title
         self.author_id = author_id
         self.desc = desc
