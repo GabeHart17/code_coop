@@ -10,14 +10,19 @@ class UserManager:
             self.conn = psycopg2.connect(db_url, sslmode='require')
         self.cur = self.conn.cursor()
 
+    def all_usernames(self):
+        self.cur.execute("SELECT username FROM users;")
+        users = self.cur.fetchall()
+        return [i[0] for i in users]
+
     def get_user_by_name(self, uname):
-        self.cur.execute("SELECT * FROM users WHERE username=%s", (uname,))
+        self.cur.execute("SELECT * FROM users WHERE username=%s;", (uname,))
         u = self.cur.fetchone()
         if u is None: return u
         return User(u[0], u[1], hash=u[2])
 
     def get_user_by_id(self, uid):
-        self.cur.execute("SELECT * FROM users WHERE id=%s", (uid,))
+        self.cur.execute("SELECT * FROM users WHERE id=%s;", (uid,))
         u = self.cur.fetchone()
         if u is None: return u
         return User(u[0], u[1], hash=u[2])
@@ -27,7 +32,7 @@ class UserManager:
         if self.get_user_by_name(uname) is not None:
             return False
         hash = ws.generate_password_hash(psk)
-        self.cur.execute("INSERT INTO users (username, hash) VALUES (%s, %s)", (uname, hash))
+        self.cur.execute("INSERT INTO users (username, hash) VALUES (%s, %s);", (uname, hash))
         self.conn.commit()
         return True
 

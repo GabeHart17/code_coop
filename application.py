@@ -68,6 +68,11 @@ def register():
         err = 'passwords do not match'
     return render_template('register.html', error=err)
 
+@app.route('/browse', methods=['GET'])  # temporary
+def browse():
+    usrs = usr_mgr.all_usernames()
+    return render_template('browse.html', users=usrs)
+
 @app.route('/profile', methods=['GET'])
 def profile():
     req_usr = request.args.get('u')
@@ -100,16 +105,16 @@ def dashboard():
     chals = db_mgr.get_challenges_by_user(current_user.uid)
     return render_template('dashboard.html', uname=current_user.uname, challenges=chals)
 
-# @app.route('/edit', methods=['GET'])
-# @login_required
-# def edit():
-#     ch_req = request.args.get('c')
-#     if ch_req is None:
-#         return redirect('/dashboard')
-#     ch = get_challenge_by_id()
-#     if ch.author_id != current_user.uid:
-#         return redirect('/dashboard')
-#     return render_template('editor.html', challenge=ch)
+@app.route('/edit', methods=['GET'])
+@login_required
+def edit():
+    ch_req = request.args.get('c')
+    if ch_req is None:
+        return redirect('/dashboard')
+    ch = db_mgr.get_challenge_by_id()
+    if ch.author_id != current_user.uid:
+        return redirect('/dashboard')
+    return render_template('editor.html', challenge=ch)
 
 # @app.route('/editorsave', methods=['POST'])
 # @login_required
@@ -125,7 +130,10 @@ def dashboard():
 #         request.form['instructions'],
 #         test_cases
 #         )
-    # db_mgr.delete
+#     if ch is not None:  # for future, fix so it actually updates rather than replaces
+#         db_mgr.delete_challenge(ch.cid)
+#     db_mgr.add_challenge(new_ch)
+#     return redirect('/dashboard')
 
 if __name__ == '__main__':
     app.run()

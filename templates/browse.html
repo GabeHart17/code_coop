@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <h2>User Pages</h2>
+    <table>
+      {% for u in users %}
+      <tr><td><a href="profile?u={{ u }}">{{ u }}</a></td></tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>
