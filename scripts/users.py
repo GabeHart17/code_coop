@@ -24,6 +24,7 @@ class UserManager:
             return False
         hash = ws.generate_password_hash(psk)
         self.cur.execute("INSERT INTO users (username, hash) VALUES (%s, %s)", (uname, hash))
+        self.conn.commit()
         return True
 
     def authenticate_user(self, usr, psk):

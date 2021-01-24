@@ -1,7 +1,8 @@
 import os
 import psycopg2
 from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_login import LoginManager
+from flask_login import LoginManager, login_user
+import werkzeug.security as ws
 from scripts.users import User, UserManager
 # from scripts/database_manager import DatabaseManager, Challenge, TestCase
 
@@ -43,7 +44,7 @@ def login():
         psk = request.form['password']
         if (usr_mgr.authenticate_user(usr, psk)):
             login_user(usr)
-            return redirect('/index')
+            return redirect('/')
         else:
             err = 'invalid_credentials'
     else:
@@ -56,7 +57,7 @@ def register():
         return render_template('register.html')
     err = ''
     uname = request.form['username']
-    psk0 = request.form['pasword']
+    psk0 = request.form['password']
     psk1 = request.form['confirmpassword']
     if ws.safe_str_cmp(psk0, psk1):
         if usr_mgr.create_user(uname, psk0):
