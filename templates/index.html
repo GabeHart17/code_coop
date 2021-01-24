@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <h1>index</h1>
+    {% if current_user.is_authenticated %}
+    <b>{{ current_user.uname }}</b> is logged in
+    <br>
+    <form action="/logout" method="post">
+      <input type="submit" value="Logout">
+    </form>
+    {% endif %}
+  </body>
+</html>
