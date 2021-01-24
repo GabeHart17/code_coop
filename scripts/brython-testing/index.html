@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/brython@3.9.0/brython.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/brython@3.9.0/brython_stdlib.js"></script>
+    </head>
+    <body onload="brython()">
+        <h1 id="title">Factorial</h1> 
+        <h4>For a given integer n return n(n-1)(n-2)...*1</h4>
+        <p>Make a function that finds the factorial of an integer. Recursive or loop variants are permitted.</p>
+        <script type="text/python">
+            from browser import document
+            from browser.html import TABLE, TR, TH, TD
+
+            case_outputs = TABLE()
+            row = TR()
+            row <= TH("Test Case")
+            row <= TH("Output")
+            case_outputs <= row 
+            document['output'] <= case_outputs
+
+            def new_case_row(table, n, value):
+                row = TR()
+                row <= TD(f"{n}")
+                row <= TD(f"{value}")
+                table <= row
+
+            test_inputs = [5, 0, 10]
+            test_outputs = [120, 1, 3628800]
+            print("Hello World")
+            def click(ev):
+                code = document['input'].value
+                process="%s%s%s%s" % (
+                    f"\ntest_inputs = {test_inputs}",
+                    f"\ntest_outputs = {test_outputs}",
+                    f"\nfor i in range(0, len(test_inputs)):",
+                    f"\n    new_case_row(case_outputs, i, main(test_inputs[i]) == test_outputs[i])",
+                )
+                exec(code+process)
+            document["mybutton"].bind("click", click)
+        </script>
+        Input:<br>
+        <textarea id="input" rows="20" cols="100"></textarea>
+        <br><button id="mybutton">Run code!</button>
+        <div id ="output"></div>
+    </body>
+</html>
