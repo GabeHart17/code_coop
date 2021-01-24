@@ -10,7 +10,9 @@
         
         <ul> Example cases:
             {% for case in challenge.test_cases %}
-              <li>{{ case.specified_input if case.shown else "" }}&nbsp;{{ case.specified_output if case.shown else "" }}</li>
+                {% if case.shown %}  
+                    <li>{{ case.specified_input }}&nbsp;{{ case.specified_output }}</li>
+                {% endif %}
             {% endfor %}
         </ul>
 
