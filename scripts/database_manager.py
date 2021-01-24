@@ -4,7 +4,7 @@ class DatabaseManager:
     def __init__(self, conn):
         self.conn = conn;
         self.cur = self.conn.cursor()
-    
+
     def add_testcase(self, chal_id, test_case):
         self.cur.execute("INSERT INTO TestCases (challenge_id, shown, input, output) VALUES (%s, %s, %s, %s);",
         (chal_id, test_case.shown, test_case.specified_input, test_case.specified_output))
@@ -42,7 +42,7 @@ class DatabaseManager:
         db_data = cur.fetchall()
         chal_case_ids = [x.case_id for x in chal.test_cases]
         db_case_ids = [x[1] for x in db_data]
-        
+
         for case_id in db_case_ids: #delete removed cases
             if case_id not in chal_case_ids:
                 self.delete_testcase(case_id)
@@ -61,7 +61,7 @@ class DatabaseManager:
             test_cases = [list(x) for x in list(self.cur.fetchall())]
             for case in test_cases:
                 chal_data[-1].append(TestCase(*tuple(case[:1]+case[2:])))
-            return Challenge(*tuple(chal_data)) 
+            return Challenge(*tuple(chal_data))
         return None
     def get_challenges_by_user(self, user_id):
         self.cur.execute("SELECT * FROM Challenges WHERE author_id=%s;", (user_id,))
@@ -94,7 +94,7 @@ class TestCase:
 if __name__ == "__main__":
     conn = psycopg2.connect("dbname=mydb user=benjabob317")
     manager = DatabaseManager(conn)
-    
+
     factorial = Challenge(
         -1,
         "Factorial",
