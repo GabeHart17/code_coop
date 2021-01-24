@@ -19,22 +19,30 @@ class DatabaseManager:
     def add_challenge(self, chal):
         chal.id = self.new_challenge_id()
         self.cur.execute("INSERT INTO Challenges (id, title, author_id, description, instructions) VALUES (%s, '%s', %s, '%s', '%s');"
-         % (chal.id, chal.title, chal.author_id, chal.desc, chal.instructions))
+        % (chal.id, chal.title, chal.author_id, chal.desc, chal.instructions))
         for case in chal.test_cases:
             self.add_testcase(chal.id, case)
         conn.commit()
     def add_testcase(self, chal_id, test_case):
         test_case.id = self.new_testcase_id()
         self.cur.execute(f"INSERT INTO TestCases VALUES ({test_case.id}, {chal_id}, {test_case.shown}, '{test_case.specified_input}', '{test_case.specified_output}');")
-    def delete_challenge(self, chal_id):
-        self.cur.execute(f"DELETE FROM Challenges WHERE id={chal_id}")
-        self.cur.execute(f"DELETE FROM TestCases WHERE challenge_id={chal_id}")
         conn.commit()
-        pass
+    def delete_challenge(self, chal_id):
+        self.cur.execute(f"DELETE FROM Challenges WHERE id={chal_id};")
+        self.cur.execute(f"DELETE FROM TestCases WHERE challenge_id={chal_id};")
+        conn.commit()
     def update_challenge(self, chal):
-        pass
+        self.cur.execute(f"UPDATE Challenges SET title='{chal.title}', author_id={chal.author_id}, description='{chal.desc}', instructions='{chal.instructions}' WHERE id={chal.id};");
+        
+        conn.commit()
     def get_challenge_by_id(self, chal_id):
-        pass
+        self.cur.execute(f"SELECT * FROM Challenges WHERE id={chal_id};")
+        chal_data = list(self.cur.fetchone()) + [[]]
+        self.cur.execute(f"SELECT * FROM TestCases WHERE challenge_id={chal_id};")
+        test_cases = [list(x) for x in list(self.cur.fetchall())]
+        for case in test_cases:
+            chal_data[-1].append(TestCase(*tuple(case[:1]+case[2:])))
+        return Challenge(*tuple(chal_data)) 
     def get_challenges_by_user(self, user_id):
         pass
     def get_challenges_by_kewords(self, search_term):
@@ -75,9 +83,5 @@ if __name__ == "__main__":
 
     print(manager.new_challenge_id())
     print(manager.new_testcase_id())
-    manager.add_challenge(factorial)
-    print(manager.new_challenge_id())
-    print(manager.new_testcase_id())
-    manager.delete_challenge(0)
-    print(manager.new_challenge_id())
-    print(manager.new_testcase_id())
+    print(vars(manager.get_challenge_by_id(0)))
+    print([vars(x) for x in manager.get_challenge_by_id(0).test_cases])
