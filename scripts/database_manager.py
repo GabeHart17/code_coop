@@ -30,7 +30,7 @@ class DatabaseManager:
     def add_challenge(self, chal):
         self.cur.execute("INSERT INTO challenges (title, author_id, description, instructions) VALUES (%s, %s, %s, %s);",
         (chal.title, chal.author_id, chal.desc, chal.instructions))
-        self.cur.execute("SELECT MAX(id) FROM challenges")
+        self.cur.execute("SELECT MAX(id) FROM challenges;")
         chal.cid = self.cur.fetchone()[0]
         for case in chal.test_cases:
             self.add_testcase(chal.cid, case)

@@ -1,6 +1,6 @@
 import os
 import psycopg2
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import werkzeug.security as ws
 from scripts.users import User, UserManager
@@ -71,6 +71,8 @@ def register():
 @app.route('/profile', methods=['GET'])
 def profile():
     req_usr = request.args.get('u')
+    if req_usr is None:
+        return redirect('/')
     usr = usr_mgr.get_user_by_name(req_usr)
     if usr is None:
         return redirect('/')
@@ -79,11 +81,52 @@ def profile():
     chals = db_mgr.get_challenges_by_user(usr.uid)
     return render_template('profile.html', uname=usr.uname, challenges=chals)
 
+@app.route('/challenge', methods=['GET'])
+def challenge():
+    req_ch = request.args.get('c')
+    if req_ch is None:
+        return redirect('/')
+    ch = db_mgr.get_challenge_by_id(req_ch)
+    if ch  is None:
+        return redirect('/')
+    auth = usr_mgr.get_user_by_id(ch.author_id).uname
+    test_in = str([int(i.specified_input) for i in ch.test_cases])
+    test_out = str([int(i.specified_output) for i in ch.test_cases])
+    return render_template('challenge.html', challenge=ch, author=auth, ti=test_in, to=test_out)
+
 @app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
     chals = db_mgr.get_challenges_by_user(current_user.uid)
     return render_template('dashboard.html', uname=current_user.uname, challenges=chals)
+
+# @app.route('/edit', methods=['GET'])
+# @login_required
+# def edit():
+#     ch_req = request.args.get('c')
+#     if ch_req is None:
+#         return redirect('/dashboard')
+#     ch = get_challenge_by_id()
+#     if ch.author_id != current_user.uid:
+#         return redirect('/dashboard')
+#     return render_template('editor.html', challenge=ch)
+
+# @app.route('/editorsave', methods=['POST'])
+# @login_required
+# def save_challenge():
+#     ch = db_mgr.get_challenge_by_id(request.form['challenge_id'])
+#     if ch.author_id != current_user.uid:
+#         abort(401)
+#     new_ch = Challenge(
+#         -1,
+#         current_user.uid,
+#         request.form['title',
+#         request.form['desc'],
+#         request.form['instructions'],
+#         test_cases
+#         )
+    # db_mgr.delete
+
 
 if __name__ == '__main__':
     app.run()

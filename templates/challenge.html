@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/brython@3.9.0/brython.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/brython@3.9.0/brython_stdlib.js"></script>
+    </head>
+    <body onload="brython()">
+        <h1 id="title">{{ challenge.title }} - written by {{ author }}</h1>
+        <h4>{{ challenge.description }}</h4>
+        <p>{{ challenge.instructions }}</p>
+
+        <ul> Example cases:
+            {% for case in challenge.test_cases %}
+                {% if case.shown %}
+                    <li>{{ case.specified_input }}&nbsp;{{ case.specified_output }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+
+        <script type="text/python">
+            from browser import document
+            from browser.html import TABLE, TR, TH, TD
+
+            case_outputs = TABLE()
+            row = TR()
+            row <= TH("Test Case")
+            row <= TH("Output")
+            case_outputs <= row
+            document['output'] <= case_outputs
+
+            def new_case_row(table, n, value):
+                row = TR()
+                row <= TD(f"{n}")
+                row <= TD(f"{value}")
+                table <= row
+
+            test_inputs = {{ ti }}
+            test_outputs = {{ to }}
+
+            def click(ev):
+                code = document['input'].value
+                process="%s%s%s%s" % (
+                    f"\ntest_inputs = {test_inputs}",
+                    f"\ntest_outputs = {test_outputs}",
+                    f"\nfor i in range(0, len(test_inputs)):",
+                    f"\n    new_case_row(case_outputs, i, main(test_inputs[i]) == test_outputs[i])",
+                )
+                exec(code+process)
+            document["mybutton"].bind("click", click)
+        </script>
+        Input:<br>
+        <textarea id="input" rows="20" cols="100"></textarea>
+        <br><button id="mybutton">Run code!</button>
+        <div id ="output"></div>
+    </body>
+</html>
