@@ -1,7 +1,7 @@
 import os
 import psycopg2
 from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_login import LoginManager, login_user
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import werkzeug.security as ws
 from scripts.users import User, UserManager
 # from scripts/database_manager import DatabaseManager, Challenge, TestCase
@@ -35,6 +35,8 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect('/')
     if request.method == 'GET':
         return render_template('login.html')
     uname = request.form['username']
@@ -51,8 +53,17 @@ def login():
         err = 'no such user'
     return render_template('login.html', error=err)
 
+@app.route('/logout', methods=['POST'])
+@login_required
+def logout():
+    logout_user()
+    return redirect('/')
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect('/')
     if request.method == 'GET':
         return render_template('register.html')
     err = ''
