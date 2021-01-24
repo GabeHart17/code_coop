@@ -5,13 +5,17 @@ class DatabaseManager:
         self.conn = conn;
         self.cur = self.conn.cursor()
     def new_challenge_id(self):
+        self.cur.execute("SELECT COUNT(id) FROM Challenges")
+        if self.cur.fetchone()[0] == 0:
+            return 0
         self.cur.execute("SELECT MAX(id) FROM Challenges")
-        count=self.cur.fetchone()[0]
-        return (count+1 if count not in [None, 0] else 0)
+        return self.cur.fetchone()[0]+1
     def new_testcase_id(self):
         self.cur.execute("SELECT COUNT(id) FROM TestCases")
-        count=self.cur.fetchone()[0]
-        return (count+1 if count not in [None, 0] else 0)
+        if self.cur.fetchone()[0] == 0:
+            return 0
+        self.cur.execute("SELECT MAX(id) FROM TestCases")
+        return self.cur.fetchone()[0]+1
     def add_challenge(self, chal):
         chal.id = self.new_challenge_id()
         self.cur.execute("INSERT INTO Challenges (id, title, author_id, description, instructions) VALUES (%s, '%s', %s, '%s', '%s');"
@@ -22,7 +26,6 @@ class DatabaseManager:
     def add_testcase(self, chal_id, test_case):
         test_case.id = self.new_testcase_id()
         self.cur.execute(f"INSERT INTO TestCases VALUES ({test_case.id}, {chal_id}, {test_case.shown}, '{test_case.specified_input}', '{test_case.specified_output}');")
-
     def delete_challenge(self, chal_id):
         self.cur.execute(f"DELETE FROM Challenges WHERE id={chal_id}")
         self.cur.execute(f"DELETE FROM TestCases WHERE challenge_id={chal_id}")
@@ -72,8 +75,9 @@ if __name__ == "__main__":
 
     print(manager.new_challenge_id())
     print(manager.new_testcase_id())
-
+    manager.add_challenge(factorial)
+    print(manager.new_challenge_id())
+    print(manager.new_testcase_id())
     manager.delete_challenge(0)
-    manager.delete_challenge(1)
     print(manager.new_challenge_id())
     print(manager.new_testcase_id())
