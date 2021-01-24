@@ -31,8 +31,8 @@
                 row <= TD(f"{value}")
                 table <= row
 
-            test_inputs = {{ [x.specified_input for x in challenge.test_cases] }} 
-            test_outputs = {{ [x.specified_output for x in challenge.test_cases] }}
+            test_inputs = {{ ti }} 
+            test_outputs = {{ to }}
             
             def click(ev):
                 code = document['input'].value
