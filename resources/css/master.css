@@ -1,0 +1,34 @@
+/*Search bar styling*/
+.searchBar {
+    position: relative;
+    display: flex;
+}
+
+.searchBar input {
+    border: 3px solid;
+    border-right: none;
+    padding: 5px;
+    border-radius: 5px 0 0 5px;
+    outline: none;
+}
+
+.searchBar input:focus {
+    color: #00B4CC;
+}
+
+.searchBar button {
+    width: 40px;
+    cursor: pointer;
+    border: 3px solid;
+    padding: 5px;
+    border-radius: 0 5px 5px 0;
+    outline: none;
+}
+
+.searchBar button:hover {
+    color: #00B4CC;
+}
+
+.searchBar button:active {
+    background-color: #00B4CC;
+}
