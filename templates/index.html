@@ -10,8 +10,10 @@
     <b>{{ current_user.uname }}</b> is logged in
     <br>
     <form action="/logout" method="post">
-      <input type="submit" value="Logout">
+      <input type="submit" value="Log Out">
     </form>
+    {% else %}
+    <a href=login>Log In</a>
     {% endif %}
   </body>
 </html>
