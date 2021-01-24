@@ -6,39 +6,39 @@ class DatabaseManager:
         self.cur = self.conn.cursor()
 
     def add_testcase(self, chal_id, test_case):
-        self.cur.execute("INSERT INTO TestCases (challenge_id, shown, input, output) VALUES (%s, %s, %s, %s);",
+        self.cur.execute("INSERT INTO test_cases (challenge_id, shown, input, output) VALUES (%s, %s, %s, %s);",
         (chal_id, test_case.shown, test_case.specified_input, test_case.specified_output))
         conn.commit()
     def delete_testcase(self, case_id):
-        self.cur.execute("DELETE FROM TestCases WHERE id=%s;", (case_id,))
+        self.cur.execute("DELETE FROM test_cases WHERE id=%s;", (case_id,))
         conn.commit()
     def update_testcase(self, case):
-        self.cur.execute("UPDATE TestCases SET shown=%s, input=%s, output=%s WHERE id=%s;",
+        self.cur.execute("UPDATE test_cases SET shown=%s, input=%s, output=%s WHERE id=%s;",
         (case.shown, case.specified_input, case.specified_output, case.case_id))
         conn.commit()
     def get_testcase_by_id(self, case_id):
-        self.cur.execute("SELECT * FROM TestCases WHERE id=%s;", (case_id,))
+        self.cur.execute("SELECT * FROM test_cases WHERE id=%s;", (case_id,))
         case_data = self.cur.fetchone()
         if case_data != None:
             case = list(case_data)
             return TestCase(*tuple(case[:1]+case[2:]))
         return None
     def add_challenge(self, chal):
-        self.cur.execute("INSERT INTO Challenges (title, author_id, description, instructions) VALUES (%s, %s, %s, %s);",
+        self.cur.execute("INSERT INTO challenges (title, author_id, description, instructions) VALUES (%s, %s, %s, %s);",
         (chal.title, chal.author_id, chal.desc, chal.instructions))
-        self.cur.execute("SELECT MAX(id) FROM Challenges")
+        self.cur.execute("SELECT MAX(id) FROM challenges")
         chal.id = self.cur.fetchone()[0]
         for case in chal.test_cases:
             self.add_testcase(chal.id, case)
         conn.commit()
     def delete_challenge(self, chal_id):
-        self.cur.execute("DELETE FROM Challenges WHERE id=%s;", (chal_id,))
-        self.cur.execute("DELETE FROM TestCases WHERE challenge_id=%s;", (chal_id,))
+        self.cur.execute("DELETE FROM challenges WHERE id=%s;", (chal_id,))
+        self.cur.execute("DELETE FROM test_cases WHERE challenge_id=%s;", (chal_id,))
         conn.commit()
     def update_challenge(self, chal): #may not be a great method to call
-        self.cur.execute("UPDATE Challenges SET title=%s, author_id=%s, description=%s, instructions=%s WHERE id=%s;",
+        self.cur.execute("UPDATE challenges SET title=%s, author_id=%s, description=%s, instructions=%s WHERE id=%s;",
         (chal.title, chal.author_id, chal.desc, chal.instructions, chal.id))
-        self.cur.execute("SELECT * FROM TestCases WHERE challenge_id=%s;", (chal.id,))
+        self.cur.execute("SELECT * FROM test_cases WHERE challenge_id=%s;", (chal.id,))
         db_data = cur.fetchall()
         chal_case_ids = [x.case_id for x in chal.test_cases]
         db_case_ids = [x[1] for x in db_data]
@@ -53,18 +53,18 @@ class DatabaseManager:
                 self.update_testcase(chal.test_cases[i])
         conn.commit()
     def get_challenge_by_id(self, chal_id):
-        self.cur.execute("SELECT * FROM Challenges WHERE id=%s;", (chal_id,))
+        self.cur.execute("SELECT * FROM challenges WHERE id=%s;", (chal_id,))
         chal_data = self.cur.fetchone()
         if chal_data != None:
             chal_data = list(chal_data) + [[]]
-            self.cur.execute("SELECT * FROM TestCases WHERE challenge_id=%s;", (chal_id,))
+            self.cur.execute("SELECT * FROM test_cases WHERE challenge_id=%s;", (chal_id,))
             test_cases = [list(x) for x in list(self.cur.fetchall())]
             for case in test_cases:
                 chal_data[-1].append(TestCase(*tuple(case[:1]+case[2:])))
             return Challenge(*tuple(chal_data))
         return None
     def get_challenges_by_user(self, user_id):
-        self.cur.execute("SELECT * FROM Challenges WHERE author_id=%s;", (user_id,))
+        self.cur.execute("SELECT * FROM challenges WHERE author_id=%s;", (user_id,))
         chals = self.cur.fetchall()
         out = []
         for chal_id in [x[0] for x in chals]:
