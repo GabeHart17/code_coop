@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <h3>Login</h3>
+    <form action="/register" method="post">
+      <p>Username:</p>
+      <input type="text" name="username" value="" required>
+      <br>
+      <p>Password:</p>
+      <input type="password" name="password" value="" required>
+      <br>
+      <p>Re-enter password:</p>
+      <input type="password" name="confirmpassword" value="" required>
+      <br>
+      <input type="submit" value="Register">
+    </form>
+    <br>
+    <h5>{{ error }}</h5>
+  </body>
+</html>
