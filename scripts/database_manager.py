@@ -4,14 +4,7 @@ class DatabaseManager:
     def __init__(self, conn):
         self.conn = conn;
         self.cur = self.conn.cursor()
-    def add_challenge(self, chal):
-        self.cur.execute("INSERT INTO Challenges (title, author_id, description, instructions) VALUES (%s, %s, %s, %s);",
-        (chal.title, chal.author_id, chal.desc, chal.instructions))
-        self.cur.execute("SELECT MAX(id) FROM Challenges")
-        chal.id = self.cur.fetchone()[0]
-        for case in chal.test_cases:
-            self.add_testcase(chal.id, case)
-        conn.commit()
+    
     def add_testcase(self, chal_id, test_case):
         self.cur.execute("INSERT INTO TestCases (challenge_id, shown, input, output) VALUES (%s, %s, %s, %s);",
         (chal_id, test_case.shown, test_case.specified_input, test_case.specified_output))
@@ -20,14 +13,31 @@ class DatabaseManager:
         self.cur.execute(f"DELETE FROM TestCases WHERE id={case_id};")
         conn.commit()
     def update_testcase(self, case):
-        self.cur.execute(f"UPDATE TestCases SET shown={case.shown}, input='{chal.specified_input}', output='{chal.specified_output}' WHERE id={case.case_id};");
+        self.cur.execute("UPDATE TestCases SET shown=%s, input=%s, output=%s WHERE id=%s;",
+        (case.shown, case.specified_input, case.specified_output, case.case_id))
+        conn.commit()
+    def get_testcase_by_id(self, case_id):
+        self.cur.execute(f"SELECT * FROM TestCases WHERE id={case_id};")
+        case_data = self.cur.fetchone()
+        if case_data != None:
+            case = list(case_data)
+            return TestCase(*tuple(case[:1]+case[2:]))
+        return None
+    def add_challenge(self, chal):
+        self.cur.execute("INSERT INTO Challenges (title, author_id, description, instructions) VALUES (%s, %s, %s, %s);",
+        (chal.title, chal.author_id, chal.desc, chal.instructions))
+        self.cur.execute("SELECT MAX(id) FROM Challenges")
+        chal.id = self.cur.fetchone()[0]
+        for case in chal.test_cases:
+            self.add_testcase(chal.id, case)
         conn.commit()
     def delete_challenge(self, chal_id):
         self.cur.execute(f"DELETE FROM Challenges WHERE id={chal_id};")
         self.cur.execute(f"DELETE FROM TestCases WHERE challenge_id={chal_id};")
         conn.commit()
     def update_challenge(self, chal): #may not be a great method to call
-        self.cur.execute(f"UPDATE Challenges SET title='{chal.title}', author_id={chal.author_id}, description='{chal.desc}', instructions='{chal.instructions}' WHERE id={chal.id};");
+        self.cur.execute("UPDATE Challenges SET title=%s, author_id=%s, description=%s, instructions=%s WHERE id=%s;",
+        (chal.title, chal.author_id, chal.desc, chal.instructions, chal.id))
         self.cur.execute(f"SELECT * FROM TestCases WHERE challenge_id={chal.id};")
         db_data = cur.fetchall()
         chal_case_ids = [x.case_id for x in chal.test_cases]
@@ -52,8 +62,7 @@ class DatabaseManager:
             for case in test_cases:
                 chal_data[-1].append(TestCase(*tuple(case[:1]+case[2:])))
             return Challenge(*tuple(chal_data)) 
-        else:
-            return None
+        return None
     def get_challenges_by_user(self, user_id):
         self.cur.execute(f"SELECT * FROM Challenges WHERE author_id={user_id};")
         chals = self.cur.fetchall()
