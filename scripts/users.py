@@ -3,7 +3,8 @@ import werkzeug.security as ws
 
 class UserManager:
     def __init__(self, db_url):
-        self.conn = psycopg2.connect("dbname=codecoop user=postgres password=postgres host=localhost")
+        # self.conn = psycopg2.connect("dbname=codecoop user=postgres password=postgres host=localhost")
+        self.conn = psycopg2.connect(db_url, sslmode='require')
         self.cur = self.conn.cursor()
 
     def get_user_by_name(self, uname):
