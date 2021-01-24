@@ -4,9 +4,9 @@
         <script src="https://cdn.jsdelivr.net/npm/brython@3.9.0/brython_stdlib.js"></script>
     </head>
     <body onload="brython()">
-        <h1 id="title">{ challenge.title } - written by { author }</h1> 
-        <h4>{ challenge.description }</h4>
-        <p>{ challenge.instructions }</p>
+        <h1 id="title">{{ challenge.title }} - written by {{ author }}</h1> 
+        <h4>{{ challenge.description }}</h4>
+        <p>{{ challenge.instructions }}</p>
         
         <ul> Example cases:
             {% for case in challenge.test_cases %}
@@ -31,8 +31,8 @@
                 row <= TD(f"{value}")
                 table <= row
 
-            test_inputs = { [x.specified_input for x in challenge.test_cases] } 
-            test_outputs = { [x.specified_output for x in challenge.test_cases] }
+            test_inputs = {{ [x.specified_input for x in challenge.test_cases] }} 
+            test_outputs = {{ [x.specified_output for x in challenge.test_cases] }}
             
             def click(ev):
                 code = document['input'].value
