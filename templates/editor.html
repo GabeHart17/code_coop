@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>CodeCoop - Edit Challenge</title>
+    <link rel="icon" href="../resources/code-coop.png">
+</head>
+
+<body>
+
+    <div class="row">
+        <form class="" action="/editorsave" method="post">
+            <input type="hidden" name="cid" value="{{ challenge.id }}"">
+            <input type="text" name="title" value="" placeholder="Challenge Title">
+            <h2>Challenge Description</h2>
+            <p>Write the description and instructions for your challenge</p>
+            <textarea name="desc" rows="5" cols="85" placeholder="Enter Short Description Here.."></textarea>
+            <textarea name="instructions" rows="25" cols="85" placeholder="Enter Instructions Here.."></textarea>
+            <h2>Enter Test Cases</h2>
+            <input type="text" name="tc1" value="" placeholder="Enter Test Case..">
+            <input type="text" name="out1" value="" placeholder="Enter Expected Output..">
+            <label for="hid1">hidden</label>
+            <input type="checkbox" name="hid1" id="hid1" value="">
+            <br>
+            <input type="text" name="tc2" value="" placeholder="Enter Test Case..">
+            <input type="text" name="out2" value="" placeholder="Enter Expected Output..">
+            <label for="hid2">hidden</label>
+            <input type="checkbox" name="hid2" id="hid2" value="">
+            <br>
+            <input type="text" name="tc3" value="" placeholder="Enter Test Case..">
+            <input type="text" name="out3" value="" placeholder="Enter Expected Output..">
+            <label for="hid3">hidden</label>
+            <input type="checkbox" name="hid3" id="hid3" value="">
+            <br>
+            <input type="text" name="tc4" value="" placeholder="Enter Test Case..">
+            <input type="text" name="out4" value="" placeholder="Enter Expected Output..">
+            <label for="hid4">hidden</label>
+            <input type="checkbox" name="hid4" id="hid4" value="">
+            <br>
+            <input type="text" name="tc5" value="" placeholder="Enter Test Case..">
+            <input type="text" name="out5" value="" placeholder="Enter Expected Output..">
+            <label for="hid5">hidden</label>
+            <input type="checkbox" name="hid5" id="hid5" value="">
+            <br>
+            <input type="submit" value="save">
+        </form>
+    </div>
+
+</body>
+</html>

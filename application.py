@@ -109,31 +109,36 @@ def dashboard():
 @login_required
 def edit():
     ch_req = request.args.get('c')
-    if ch_req is None:
-        return redirect('/dashboard')
-    ch = db_mgr.get_challenge_by_id()
+    ch = Challenge(-1, current_user.uid, '', '', '', [])
+    if ch_req is not None:
+        ch = db_mgr.get_challenge_by_id()
     if ch.author_id != current_user.uid:
         return redirect('/dashboard')
     return render_template('editor.html', challenge=ch)
 
-# @app.route('/editorsave', methods=['POST'])
-# @login_required
-# def save_challenge():
-#     ch = db_mgr.get_challenge_by_id(request.form['challenge_id'])
-#     if ch.author_id != current_user.uid:
-#         abort(401)
-#     new_ch = Challenge(
-#         -1,
-#         current_user.uid,
-#         request.form['title',
-#         request.form['desc'],
-#         request.form['instructions'],
-#         test_cases
-#         )
-#     if ch is not None:  # for future, fix so it actually updates rather than replaces
-#         db_mgr.delete_challenge(ch.cid)
-#     db_mgr.add_challenge(new_ch)
-#     return redirect('/dashboard')
+@app.route('/editorsave', methods=['POST'])
+@login_required
+def save_challenge():
+    abort(501)
+    # if request.form['cid'] >= 0:
+    #     ch = db_mgr.get_challenge_by_id(request.form['cid'])
+    #     if ch.author_id != current_user.uid:
+    #         abort(401)
+    #     if ch is not None:  # for future, fix so it actually updates rather than replaces
+    #         db_mgr.delete_challenge(ch.cid)
+    # test_cases = []
+    # for i in range(1, 6):
+    #     tc = TestCase(-1, not reqest.form[f'hid{i}'], request.form[f'tc{i}'], reqest.form[f'out{i}'])
+    #     test_case.append(tc)
+    # new_ch = Challenge(-1,
+    #     current_user.uid,
+    #     request.form['title'],
+    #     request.form['desc'],
+    #     request.form['instructions'],
+    #     test_cases
+    #     )
+    # db_mgr.add_challenge(new_ch)
+    # return redirect('/dashboard')
 
 if __name__ == '__main__':
     app.run()
