@@ -79,5 +79,11 @@ def profile():
     chals = db_mgr.get_challenges_by_user(usr.uid)
     return render_template('profile.html', uname=usr.uname, challenges=chals)
 
+@app.route('/dashboard', methods=['GET'])
+@login_required
+def dashboard():
+    chals = db_mgr.get_challenges_by_user(current_user.uid)
+    return render_template('dashboard.html', uname=current_user.uname, challenges=chals)
+
 if __name__ == '__main__':
     app.run()
