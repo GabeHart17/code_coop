@@ -127,6 +127,24 @@ def dashboard():
 #         )
     # db_mgr.delete
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect('/')
+    if request.method == 'GET':
+        return render_template('register.html')
+    err = ''
+    uname = request.form['username']
+    psk0 = request.form['password']
+    psk1 = request.form['confirmpassword']
+    if ws.safe_str_cmp(psk0, psk1):
+        if usr_mgr.create_user(uname, psk0):
+            return redirect('login')
+        else:
+            err = 'username taken'
+    else:
+        err = 'passwords do not match'
+    return render_template('register.html', error=err)
 
 if __name__ == '__main__':
     app.run()
