@@ -1,2 +1,4 @@
+import re
 def verify(s):
-    return True
+    match = re.match(r'\[([0-9](, )?)*\]|[0-9]*', s)
+    return bool(match)
