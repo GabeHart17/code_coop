@@ -4,28 +4,17 @@ class DatabaseManager:
     def __init__(self, conn):
         self.conn = conn;
         self.cur = self.conn.cursor()
-    def new_challenge_id(self):
-        self.cur.execute("SELECT COUNT(id) FROM Challenges")
-        if self.cur.fetchone()[0] == 0:
-            return 0
-        self.cur.execute("SELECT MAX(id) FROM Challenges")
-        return self.cur.fetchone()[0]+1
-    def new_testcase_id(self):
-        self.cur.execute("SELECT COUNT(id) FROM TestCases")
-        if self.cur.fetchone()[0] == 0:
-            return 0
-        self.cur.execute("SELECT MAX(id) FROM TestCases")
-        return self.cur.fetchone()[0]+1
     def add_challenge(self, chal):
-        chal.id = self.new_challenge_id()
-        self.cur.execute("INSERT INTO Challenges (id, title, author_id, description, instructions) VALUES (%s, '%s', %s, '%s', '%s');"
-        % (chal.id, chal.title, chal.author_id, chal.desc, chal.instructions))
+        self.cur.execute("INSERT INTO Challenges (title, author_id, description, instructions) VALUES (%s, %s, %s, %s);",
+        (chal.title, chal.author_id, chal.desc, chal.instructions))
+        self.cur.execute("SELECT MAX(id) FROM Challenges")
+        chal.id = self.cur.fetchone()[0]
         for case in chal.test_cases:
             self.add_testcase(chal.id, case)
         conn.commit()
     def add_testcase(self, chal_id, test_case):
-        test_case.id = self.new_testcase_id()
-        self.cur.execute(f"INSERT INTO TestCases VALUES ({test_case.id}, {chal_id}, {test_case.shown}, '{test_case.specified_input}', '{test_case.specified_output}');")
+        self.cur.execute("INSERT INTO TestCases (challenge_id, shown, input, output) VALUES (%s, %s, %s, %s);",
+        (chal_id, test_case.shown, test_case.specified_input, test_case.specified_output))
         conn.commit()
     def delete_testcase(self, case_id):
         self.cur.execute(f"DELETE FROM TestCases WHERE id={case_id};")
@@ -55,12 +44,16 @@ class DatabaseManager:
         conn.commit()
     def get_challenge_by_id(self, chal_id):
         self.cur.execute(f"SELECT * FROM Challenges WHERE id={chal_id};")
-        chal_data = list(self.cur.fetchone()) + [[]]
-        self.cur.execute(f"SELECT * FROM TestCases WHERE challenge_id={chal_id};")
-        test_cases = [list(x) for x in list(self.cur.fetchall())]
-        for case in test_cases:
-            chal_data[-1].append(TestCase(*tuple(case[:1]+case[2:])))
-        return Challenge(*tuple(chal_data)) 
+        chal_data = self.cur.fetchone()
+        if chal_data != None:
+            chal_data = list(chal_data) + [[]]
+            self.cur.execute(f"SELECT * FROM TestCases WHERE challenge_id={chal_id};")
+            test_cases = [list(x) for x in list(self.cur.fetchall())]
+            for case in test_cases:
+                chal_data[-1].append(TestCase(*tuple(case[:1]+case[2:])))
+            return Challenge(*tuple(chal_data)) 
+        else:
+            return None
     def get_challenges_by_user(self, user_id):
         self.cur.execute(f"SELECT * FROM Challenges WHERE author_id={user_id};")
         chals = self.cur.fetchall()
@@ -104,7 +97,6 @@ if __name__ == "__main__":
     factorial.new_test_case(True, "0", "1")
     factorial.new_test_case(False, "10", "3628800")
 
-    print(manager.new_challenge_id())
-    print(manager.new_testcase_id())
-    print(vars(manager.get_challenge_by_id(0)))
-    print([vars(x) for x in manager.get_challenge_by_id(0).test_cases])
+    manager.add_challenge(factorial)
+    print(vars(manager.get_challenge_by_id(1)))
+    print([vars(x) for x in manager.get_challenge_by_id(1).test_cases])
